@@ -15,7 +15,7 @@ function generateRandomAuctions() {
   // Random cat images
   document.querySelectorAll(".card > img").forEach(img => {
     //parseInt(Math.random() * 10)
-    img.src = "https://github.com/HeyKrishHere/zipart2/blob/92105d254a9e54d007a54ec08ffc5b8b8b2b5c9c/img/img_aadb/img" + (count++) + ".jpg" ;
+    img.src = "img/img_aadb/img" + (count++) + ".jpg" ;
 
     primaryImages.push(img.src);
     secondaryImages.push(img.src);
