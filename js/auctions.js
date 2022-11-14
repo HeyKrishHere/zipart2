@@ -15,7 +15,7 @@ function generateRandomAuctions() {
   // Random images
   document.querySelectorAll(".card > img").forEach(img => {
     //parseInt(Math.random() * 10)
-    img.src = "C:/Users/DELL/Desktop/Downloads/auction-website-master/img/img_aadb/img" + (count++) + ".jpg" ;
+    img.src = "img/img_aadb/img" + (count++) + ".jpg" ;
 
     primaryImages.push(img.src);
     secondaryImages.push(img.src);
