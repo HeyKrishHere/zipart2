@@ -12,15 +12,15 @@ let count = 1;
 
 // Random auction information
 function generateRandomAuctions() {
-  // Random cat images
+  // Random images
   document.querySelectorAll(".card > img").forEach(img => {
     //parseInt(Math.random() * 10)
-    img.src = "img/img_aadb/img" + (count++) + ".jpg" ;
+    img.src = "C:/Users/DELL/Desktop/Downloads/auction-website-master/img/img_aadb/img" + (count++) + ".jpg" ;
 
     primaryImages.push(img.src);
     secondaryImages.push(img.src);
   });
-  // Random cat names
+  // Random image names
   $.getJSON(
     "https://random-data-api.com/api/name/random_name",
     { size: startingPrices.length },
@@ -31,7 +31,7 @@ function generateRandomAuctions() {
       });
     }
   );
-  // Random lorem ipsum cat descriptions
+  // Random lorem ipsum image descriptions
   $.getJSON(
     "https://random-data-api.com/api/lorem_ipsum/random_lorem_ipsum",
     { size: startingPrices.length },
@@ -109,12 +109,13 @@ function setClocks() {
 
 // Place a bid on an item
 function placeBid() {
+
   let nowTime = new Date().getTime();
   let modalBidButton = document.querySelector("#bid-modal > div > div > div.modal-footer > button.btn.btn-primary")
   modalBidButton.setAttribute('disabled', '') // disable the button while we check
   let i = modalBidButton.id.match("[0-9]+");
   let feedback = document.getElementById("bad-amount-feedback")
-  // Cleanse input
+//  Cleanse input
   let amountElement = document.getElementById("amount-input")
   let amount = Number(amountElement.value)
   if (endTimes[i] - nowTime < 0) {
@@ -132,12 +133,16 @@ function placeBid() {
     modalBidButton.removeAttribute('disabled', '');
   } else if (!(/^-?\d*\.?\d{0,2}$/.test(amount))) {
     // field is does not contain money
+
     feedback.innerText = "Please specify a valid amount!"
     amountElement.classList.add("is-invalid")
     modalBidButton.removeAttribute('disabled', '');
   } else {
     // Checking bid amount
     // Get item and user info
+    bidModal.hide();
+    alert("Bid is placed.");
+
     let user = auth.currentUser;
     let itemId = i.toString().padStart(5, "0")
     // Documents to check and write to
@@ -289,67 +294,4 @@ function populateAuctionGrid() {
 
 function numberWithCommas(x) {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
-
-function dataListener() {
-  // Listen for updates in active auctions
-  db.collection("auction-live").doc("items").onSnapshot(function (doc) {
-    console.log("Database read from dataListener()")
-    let data = doc.data()
-    for (key in data) {
-      let cb = document.getElementById("current-bid-" + Number(key))
-      let bids = data[key]
-      // Extract bid data
-      let bidCount = (Object.keys(bids).length - 1) / 2
-      let currPound = Number.parseFloat(bids["bid" + bidCount]).toFixed(2)
-      // Check if the user is winning
-      if (auth.currentUser) {
-        let userWinning = bids["bid" + bidCount + "-user"] == auth.currentUser.uid
-      }
-      // Add bid data to HTML
-      cb.innerHTML = "£" + numberWithCommas(currPound) + " [" + bidCount + " bid" + (bidCount != 1 ? "s" : "") + "]"
-    }
-  })
-}
-
-function resetLive(i) {
-  let docRef = db.collection("auction-live").doc("items");
-  let itemId = i.toString().padStart(5, "0")
-  docRef.update({
-    [itemId]: {
-      bid0: startPrices[i]["bid0"]["amount"],
-    }
-  })
-  console.log("Database write from resetLive()")
-}
-
-function resetAllLive() {
-  console.log("Resetting live tracker")
-  for (i = 0; i < startingPrices.length; i++) {
-    resetLive(i);
-  }
-}
-
-function resetStore(i) {
-  let itemId = i.toString().padStart(5, "0")
-  let docRef = db.collection("auction-store").doc(itemId);
-  docRef.set(startPrices[i])
-  console.log("Database write from resetStore()")
-}
-
-function resetAllStore() {
-  console.log("Resetting auction storage")
-  let batch = db.batch();
-  for (i = 0; i < startingPrices.length; i++) {
-    let itemId = i.toString().padStart(5, "0")
-    let currentItem = db.collection("auction-store").doc(itemId);
-    batch.set(currentItem, startPrices[i])
-  }
-  batch.commit()
-  console.log(startingPrices.length + " database writes from resetAllStore()")
-}
-
-function resetAll() {
-  resetAllLive();
-  resetAllStore();
 }
